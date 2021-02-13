@@ -5,19 +5,19 @@ import (
 	"sync"
 )
 
-type stack struct {
-	lock sync.Mutex
+type Stack struct {
+	lock     sync.Mutex
 	elements []interface{}
 }
 
-func (s *stack) Push(d interface{}) {
+func (s *Stack) Push(d interface{}) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
 	s.elements = append(s.elements, d)
 }
 
-func (s *stack) Pop() {
+func (s *Stack) Pop() {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -29,7 +29,7 @@ func (s *stack) Pop() {
 	s.elements = s.elements[:l-1]
 }
 
-func (s *stack) Top() (interface{}, error) {
+func (s *Stack) Top() (interface{}, error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -38,9 +38,9 @@ func (s *stack) Top() (interface{}, error) {
 		return nil, errors.New("stack is currently empty")
 	}
 
-	return s.elements[l - 1], nil
+	return s.elements[l-1], nil
 }
 
-func (s *stack) Empty() bool {
+func (s *Stack) Empty() bool {
 	return len(s.elements) == 0
 }

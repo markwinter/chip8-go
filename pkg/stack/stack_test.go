@@ -6,7 +6,7 @@ import (
 )
 
 func TestStack_Push(t *testing.T) {
-	s := stack{}
+	s := Stack{}
 	s.Push(0)
 	s.Push(1)
 	s.Push(2)
@@ -19,7 +19,7 @@ func TestStack_Push(t *testing.T) {
 }
 
 func TestStack_Pop(t *testing.T) {
-	s := stack{}
+	s := Stack{}
 	s.Push(0)
 	s.Push(1)
 	s.Push(2)
@@ -34,12 +34,12 @@ func TestStack_Pop(t *testing.T) {
 }
 
 func TestStack_PopEmpty(t *testing.T) {
-	s := stack{}
+	s := Stack{}
 	s.Pop()
 }
 
 func TestStack_Top(t *testing.T) {
-	s := stack{}
+	s := Stack{}
 	s.Push(0)
 	s.Push(1)
 
@@ -49,7 +49,7 @@ func TestStack_Top(t *testing.T) {
 }
 
 func TestStack_TopEmpty(t *testing.T) {
-	s := stack{}
+	s := Stack{}
 
 	if _, err := s.Top(); err == nil {
 		t.Errorf("expected error but it was nil")
