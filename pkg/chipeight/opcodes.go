@@ -12,7 +12,7 @@ func getRegisterX(opcode uint16) uint16 {
 
 // Returns VY
 func getRegisterY(opcode uint16) uint16 {
-	return (opcode & 0x00F0) >> 8
+	return (opcode & 0x00F0) >> 4
 }
 
 // 00E0: Clear the screen
