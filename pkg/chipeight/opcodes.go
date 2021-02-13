@@ -19,6 +19,9 @@ func getRegisterY(opcode uint16) uint16 {
 // 00EE: Return from subroutine
 func op0000(c *Chipeight) {
 	switch c.currentOpcode & 0x000F {
+	case 0x0:
+		c.screen = [64 * 32]uint8{}
+		c.programCounter += 2
 	case 0xE:
 		value, err := c.stack.Top()
 		if err != nil {
@@ -92,7 +95,21 @@ func op7000(c *Chipeight) {
 	c.programCounter += 2
 }
 
+// 8XY0: Set VX = VY
+// 8XY1: Set VX = VX|VY
+// 8XY2: Set VX = VX&VY
+// 8XY3: Set VX = VX xor VY
+// 8XY4: Set VX += VY
+// 8XY5: Set VX -= VY
+// 8XY6: Store least significant bit of VX in VF and shift VX right 1
+// 8XY7: Set VX = VY - VX. Set VF=0 when there's a borrow, else 1
+// 8XYE: Store most significant bit of VX in VF then shift VX left 1
 func op8000(c *Chipeight) {
+	switch c.currentOpcode & 0x000F {
+	case 0x0:
+
+	}
+
 	c.programCounter += 2
 }
 
@@ -138,6 +155,8 @@ func opD000(c *Chipeight) {
 	c.programCounter += 2
 }
 
+// EX9E: Skip next instruction if key stored in VX is pressed
+// EXA1: Skip next instruction if key stored in VX isn't pressed
 func opE000(c *Chipeight) {
 	c.programCounter += 2
 }
@@ -148,7 +167,7 @@ func opE000(c *Chipeight) {
 func opF000(c *Chipeight) {
 	opcode := c.currentOpcode & 0x00FF
 	switch opcode {
-	case 0x0033:
+	case 0x33:
 		register := getRegisterX(c.currentOpcode)
 		c.memory[c.indexRegister] = c.registers[register] / 100
 		c.memory[c.indexRegister+1] = (c.registers[register] / 10) % 10
