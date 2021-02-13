@@ -98,7 +98,7 @@ func op7000(c *Chipeight) {
 // 8XY0: Set VX = VY
 // 8XY1: Set VX = VX|VY
 // 8XY2: Set VX = VX&VY
-// 8XY3: Set VX = VX xor VY
+// 8XY3: Set VX = VX^VY
 // 8XY4: Set VX += VY
 // 8XY5: Set VX -= VY
 // 8XY6: Store least significant bit of VX in VF and shift VX right 1
@@ -158,6 +158,19 @@ func opD000(c *Chipeight) {
 // EX9E: Skip next instruction if key stored in VX is pressed
 // EXA1: Skip next instruction if key stored in VX isn't pressed
 func opE000(c *Chipeight) {
+	register := getRegisterX(c.currentOpcode)
+	key := c.registers[register]
+
+	switch c.currentOpcode & 0x000F {
+	case 0xE:
+		if c.keys[key] == 1 {
+			c.programCounter += 2
+		}
+	case 0x1:
+		if c.keys[key] == 0 {
+			c.programCounter += 2
+		}
+	}
 	c.programCounter += 2
 }
 
