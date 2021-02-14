@@ -6,13 +6,13 @@ import (
 )
 
 // Returns VX
-func getRegisterX(opcode uint16) uint16 {
-	return (opcode & 0x0F00) >> 8
+func getRegisterX(opcode uint16) uint8 {
+	return uint8((opcode & 0x0F00) >> 8)
 }
 
 // Returns VY
-func getRegisterY(opcode uint16) uint16 {
-	return (opcode & 0x00F0) >> 4
+func getRegisterY(opcode uint16) uint8 {
+	return uint8((opcode & 0x00F0) >> 4)
 }
 
 // 00E0: Clear the screen
@@ -105,9 +105,35 @@ func op7000(c *Chipeight) {
 // 8XY7: Set VX = VY - VX. Set VF=0 when there's a borrow, else 1
 // 8XYE: Store most significant bit of VX in VF then shift VX left 1
 func op8000(c *Chipeight) {
+	registerX := getRegisterX(c.currentOpcode)
+	registerY := getRegisterY(c.currentOpcode)
+
 	switch c.currentOpcode & 0x000F {
 	case 0x0:
-
+		c.registers[registerX] = c.registers[registerY]
+	case 0x1:
+		c.registers[registerX] = registerX | registerY
+	case 0x2:
+		c.registers[registerX] = registerX & registerY
+	case 0x3:
+		c.registers[registerX] = registerX ^ registerY
+	case 0x4:
+		c.registers[registerX] += registerY
+	case 0x5:
+		c.registers[registerX] -= registerY
+	case 0x6:
+		c.registers[registerVF] = c.registers[registerX] & 0x01
+		c.registers[registerX] >>= 1
+	case 0x7:
+		if c.registers[registerX] < c.registers[registerY] {
+			c.registers[registerVF] = 0
+		} else {
+			c.registers[registerVF] = 1
+		}
+		c.registers[registerX] = c.registers[registerY] - c.registers[registerX]
+	case 0xE:
+		c.registers[registerVF] = c.registers[registerX] & 0x10
+		c.registers[registerX] <<= 1
 	}
 
 	c.programCounter += 2
@@ -152,6 +178,7 @@ func opC000(c *Chipeight) {
 
 // DXYN: Draw at (VX, VY) with width=8, height=N+1
 func opD000(c *Chipeight) {
+	log.Printf("opcode unimplemented: 0x%X", c.currentOpcode)
 	c.programCounter += 2
 }
 
@@ -174,17 +201,51 @@ func opE000(c *Chipeight) {
 	c.programCounter += 2
 }
 
+// FX07: Set VX = delay timer
+// FX0A: A key press is awaited, then stored in VX (blocking)
+// FX15: Set delay timer = VX
+// FX18: Set sound timer = VX
+// FX1E: Set I += VX
+// FX29: Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.
 // FX33: Stores the binary-coded decimal representation of VX,
 // with the most significant of three digits at the address in I,
 // the middle digit at I plus 1, and the least significant digit at I plus 2
+// FX55: Store V0-VX (inclusive) starting at memory address I
+// FX65: Fill V0-VX (inclusive) with values from memory address I
 func opF000(c *Chipeight) {
 	opcode := c.currentOpcode & 0x00FF
 	switch opcode {
+	case 0x07:
+		register := getRegisterX(c.currentOpcode)
+		c.registers[register] = c.delayTimer
+	case 0x0A:
+		log.Printf("opcode unimplemented: 0x%X", c.currentOpcode)
+	case 0x15:
+		register := getRegisterX(c.currentOpcode)
+		c.delayTimer = c.registers[register]
+	case 0x18:
+		register := getRegisterX(c.currentOpcode)
+		c.soundTimer = c.registers[register]
+	case 0x1E:
+		register := getRegisterX(c.currentOpcode)
+		c.indexRegister += uint16(c.registers[register])
+	case 0x29:
+		log.Printf("opcode unimplemented: 0x%X", c.currentOpcode)
 	case 0x33:
 		register := getRegisterX(c.currentOpcode)
 		c.memory[c.indexRegister] = c.registers[register] / 100
 		c.memory[c.indexRegister+1] = (c.registers[register] / 10) % 10
 		c.memory[c.indexRegister+2] = (c.registers[register] % 100) % 10
+	case 0x55:
+		register := getRegisterX(c.currentOpcode)
+		for i := uint8(0); i <= register; i++ {
+			c.memory[uint8(c.indexRegister)+i] = c.registers[i]
+		}
+	case 0x65:
+		register := getRegisterX(c.currentOpcode)
+		for i := uint8(0); i <= register; i++ {
+			c.registers[i] = c.memory[uint8(c.indexRegister)+i]
+		}
 	}
 
 	c.programCounter += 2

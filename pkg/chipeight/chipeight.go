@@ -9,6 +9,7 @@ import (
 const (
 	fontStartLoc    = 0x50
 	programStartLoc = 0x200
+	registerVF      = 15
 )
 
 var (
