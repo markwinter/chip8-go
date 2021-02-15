@@ -20,6 +20,7 @@ type Game struct {
 
 func (g *Game) Update(screen *ebiten.Image) error {
 	g.c8.Step()
+
 	return nil
 }
 
@@ -66,6 +67,8 @@ func main() {
 
 	ebiten.SetWindowSize(1024, 768)
 	ebiten.SetWindowTitle("Chip8 Emulator")
+	ebiten.SetMaxTPS(60)
+	ebiten.SetVsyncEnabled(true)
 
 	if err := ebiten.RunGame(game); err != nil {
 		panic(err)
