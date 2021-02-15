@@ -136,14 +136,14 @@ func op8000(c *Chipeight) {
 		c.registers[registerVF] = c.registers[registerX] & 0x01
 		c.registers[registerX] >>= 1
 	case 0x7:
-		if c.registers[registerX] < c.registers[registerY] {
-			c.registers[registerVF] = 0
-		} else {
+		if c.registers[registerY] > c.registers[registerX] {
 			c.registers[registerVF] = 1
+		} else {
+			c.registers[registerVF] = 0
 		}
 		c.registers[registerX] = c.registers[registerY] - c.registers[registerX]
 	case 0xE:
-		c.registers[registerVF] = c.registers[registerX] & 0x10
+		c.registers[registerVF] = (c.registers[registerX] & 0x80) >> 7
 		c.registers[registerX] <<= 1
 	}
 
@@ -274,18 +274,24 @@ func opF000(c *Chipeight) {
 		c.indexRegister = uint16(fontStartLoc + (5 * character))
 	case 0x33:
 		register := getRegisterX(c.currentOpcode)
-		c.memory[c.indexRegister] = c.registers[register] / 100
-		c.memory[c.indexRegister+1] = (c.registers[register] / 10) % 10
-		c.memory[c.indexRegister+2] = (c.registers[register] % 100) % 10
+		value := c.registers[register]
+
+		c.memory[c.indexRegister+2] = value % 10
+		value /= 10
+
+		c.memory[c.indexRegister+1] = value % 10
+		value /= 10
+
+		c.memory[c.indexRegister] = value % 10
 	case 0x55:
 		register := getRegisterX(c.currentOpcode)
 		for i := uint8(0); i <= register; i++ {
-			c.memory[uint8(c.indexRegister)+i] = c.registers[i]
+			c.memory[c.indexRegister+uint16(i)] = c.registers[i]
 		}
 	case 0x65:
 		register := getRegisterX(c.currentOpcode)
 		for i := uint8(0); i <= register; i++ {
-			c.registers[i] = c.memory[uint8(c.indexRegister)+i]
+			c.registers[i] = c.memory[c.indexRegister+uint16(i)]
 		}
 	}
 
