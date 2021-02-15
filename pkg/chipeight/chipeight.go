@@ -114,6 +114,7 @@ func (c *Chipeight) Step() {
 		opFunction(c)
 	} else {
 		log.Printf("unknown opcode: 0x%X", c.currentOpcode)
+		c.programCounter += 2
 	}
 
 	if c.delayTimer > 0 {
