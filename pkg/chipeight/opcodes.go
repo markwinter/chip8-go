@@ -203,7 +203,7 @@ func opD000(c *Chipeight) {
 	c.registers[registerVF] = 0
 
 	for row := uint8(0); row < height; row++ {
-		pixel := c.memory[uint8(c.indexRegister)+row]
+		pixel := c.memory[c.indexRegister+uint16(row)]
 
 		for col := uint8(0); col < width; col++ {
 			if pixel&(0x80>>col) != 0 {
