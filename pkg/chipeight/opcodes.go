@@ -112,15 +112,26 @@ func op8000(c *Chipeight) {
 	case 0x0:
 		c.registers[registerX] = c.registers[registerY]
 	case 0x1:
-		c.registers[registerX] = registerX | registerY
+		c.registers[registerX] = c.registers[registerX] | c.registers[registerY]
 	case 0x2:
-		c.registers[registerX] = registerX & registerY
+		c.registers[registerX] = c.registers[registerX] & c.registers[registerY]
 	case 0x3:
-		c.registers[registerX] = registerX ^ registerY
+		c.registers[registerX] = c.registers[registerX] ^ c.registers[registerY]
 	case 0x4:
-		c.registers[registerX] += registerY
+		sum := uint16(c.registers[registerX]) + uint16(c.registers[registerY])
+		if sum > 255 {
+			c.registers[registerVF] = 1
+		} else {
+			c.registers[registerVF] = 0
+		}
+		c.registers[registerX] += c.registers[registerY]
 	case 0x5:
-		c.registers[registerX] -= registerY
+		if c.registers[registerY] > c.registers[registerX] {
+			c.registers[registerVF] = 0
+		} else {
+			c.registers[registerVF] = 1
+		}
+		c.registers[registerX] -= c.registers[registerY]
 	case 0x6:
 		c.registers[registerVF] = c.registers[registerX] & 0x01
 		c.registers[registerX] >>= 1
@@ -144,7 +155,7 @@ func op9000(c *Chipeight) {
 	registerX := getRegisterX(c.currentOpcode)
 	registerY := getRegisterY(c.currentOpcode)
 
-	if registerX != registerY {
+	if c.registers[registerX] != c.registers[registerY] {
 		c.programCounter += 2
 	}
 
