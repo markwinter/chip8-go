@@ -31,10 +31,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	for row := 0; row < 32; row++ {
 		for col := 0; col < 64; col++ {
-			if g.frameBuffer[(row*64)+col] == 1 {
-				opts := &ebiten.DrawImageOptions{}
-				opts.GeoM.Translate(float64(col), float64(row))
-				screen.DrawImage(g.pixel, opts)
+			if g.frameBuffer[(row*64)+col] == 0 {
+				continue
+			}
+
+			opts := &ebiten.DrawImageOptions{}
+			opts.GeoM.Translate(float64(col), float64(row))
+			err := screen.DrawImage(g.pixel, opts)
+			if err != nil {
+				log.Printf("DrawImage error: %v", err)
 			}
 		}
 	}
@@ -59,7 +64,10 @@ func main() {
 	}
 
 	pixel, _ := ebiten.NewImage(1, 1, ebiten.FilterNearest)
-	pixel.Fill(color.White)
+	err := pixel.Fill(color.White)
+	if err != nil {
+		log.Fatalf("Failed to create pixel: %v", err)
+	}
 
 	game := &Game{}
 	game.c8 = c8
