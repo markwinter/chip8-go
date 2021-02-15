@@ -177,8 +177,36 @@ func opC000(c *Chipeight) {
 }
 
 // DXYN: Draw at (VX, VY) with width=8, height=N+1
+// Each row of 8 pixels is read as bit-coded starting from memory location I
+// VF is set to 1 if any screen pixels are flipped from set to unset
 func opD000(c *Chipeight) {
-	log.Printf("opcode unimplemented: 0x%X", c.currentOpcode)
+	registerX := getRegisterX(c.currentOpcode)
+	registerY := getRegisterY(c.currentOpcode)
+
+	x := c.registers[registerX] % screenWidth
+	y := c.registers[registerY] % screenHeight
+
+	width := uint8(spriteWidth)
+	height := uint8(c.currentOpcode & 0x000F) // +1 ?
+
+	c.registers[registerVF] = 0
+
+	for row := uint8(0); row < height; row++ {
+		pixel := c.memory[uint8(c.indexRegister)+row]
+
+		for col := uint8(0); col < width; col++ {
+			if pixel&(0x80>>col) != 0 {
+				screenLoc := x + col + ((y + row) * screenWidth)
+
+				if c.screen[screenLoc] == 1 {
+					c.registers[registerVF] = 1
+				}
+				c.screen[screenLoc] ^= 1
+			}
+		}
+	}
+
+	c.shouldDraw = true
 	c.programCounter += 2
 }
 
@@ -230,7 +258,9 @@ func opF000(c *Chipeight) {
 		register := getRegisterX(c.currentOpcode)
 		c.indexRegister += uint16(c.registers[register])
 	case 0x29:
-		log.Printf("opcode unimplemented: 0x%X", c.currentOpcode)
+		register := getRegisterX(c.currentOpcode)
+		character := c.registers[register]
+		c.indexRegister = uint16(fontStartLoc + (5 * character))
 	case 0x33:
 		register := getRegisterX(c.currentOpcode)
 		c.memory[c.indexRegister] = c.registers[register] / 100
