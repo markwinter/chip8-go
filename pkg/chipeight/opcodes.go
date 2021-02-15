@@ -194,26 +194,31 @@ func opD000(c *Chipeight) {
 	registerX := getRegisterX(c.currentOpcode)
 	registerY := getRegisterY(c.currentOpcode)
 
-	x := c.registers[registerX] % screenWidth
-	y := c.registers[registerY] % screenHeight
+	x := uint16(c.registers[registerX] % screenWidth)
+	y := uint16(c.registers[registerY] % screenHeight)
 
-	width := uint8(spriteWidth)
-	height := uint8(c.currentOpcode & 0x000F) // +1 ?
+	width := uint16(spriteWidth)
+	height := c.currentOpcode & 0x000F // +1 ?
 
 	c.registers[registerVF] = 0
 
-	for row := uint8(0); row < height; row++ {
-		pixel := c.memory[c.indexRegister+uint16(row)]
+	for row := uint16(0); row < height; row++ {
+		spriteByte := c.memory[c.indexRegister+row]
 
-		for col := uint8(0); col < width; col++ {
-			if pixel&(0x80>>col) != 0 {
-				screenLoc := x + col + ((y + row) * screenWidth)
+		for col := uint16(0); col < width; col++ {
+			spritePixel := spriteByte & (0x80 >> col)
 
-				if c.screen[screenLoc] == 1 {
-					c.registers[registerVF] = 1
-				}
-				c.screen[screenLoc] ^= 1
+			if spritePixel == 0 {
+				continue
 			}
+
+			screenLoc := (y+row)*screenWidth + (x + col)
+
+			if c.screen[screenLoc] == 1 {
+				c.registers[registerVF] = 1
+			}
+
+			c.screen[screenLoc] ^= 1
 		}
 	}
 
