@@ -117,10 +117,22 @@ func (c *Chipeight) Step() {
 	} else {
 		log.Printf("unknown opcode: 0x%X", c.currentOpcode)
 	}
+
+	if c.delayTimer > 0 {
+		c.delayTimer--
+	}
+
+	if c.soundTimer > 0 {
+		c.soundTimer--
+	}
 }
 
 func (c *Chipeight) ShouldDraw() bool {
-	return c.shouldDraw
+	sd := c.shouldDraw
+	if sd {
+		c.shouldDraw = false
+	}
+	return sd
 }
 
 func (c *Chipeight) GetScreen() [screenWidth * screenHeight]uint8 {
