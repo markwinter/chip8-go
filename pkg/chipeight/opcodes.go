@@ -74,7 +74,7 @@ func op5000(c *Chipeight) {
 	registerX := getRegisterX(c.currentOpcode)
 	registerY := getRegisterY(c.currentOpcode)
 
-	if registerX == registerY {
+	if c.registers[registerX] == c.registers[registerY] {
 		c.programCounter += 2
 	}
 
