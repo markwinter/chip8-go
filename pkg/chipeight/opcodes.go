@@ -198,7 +198,7 @@ func opD000(c *Chipeight) {
 	y := uint16(c.registers[registerY] % screenHeight)
 
 	width := uint16(spriteWidth)
-	height := c.currentOpcode & 0x000F // +1 ?
+	height := c.currentOpcode & 0x000F
 
 	c.registers[registerVF] = 0
 
