@@ -110,8 +110,6 @@ func (c *Chipeight) Run() {
 func (c *Chipeight) Step() {
 	c.currentOpcode = uint16(c.memory[c.programCounter])<<8 | uint16(c.memory[c.programCounter+1])
 
-	log.Printf("opcode: 0x%X", c.currentOpcode)
-
 	if opFunction, ok := opcodeMap[c.currentOpcode&0xF000]; ok {
 		opFunction(c)
 	} else {
