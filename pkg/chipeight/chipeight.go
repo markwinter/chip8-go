@@ -10,6 +10,9 @@ const (
 	fontStartLoc    = 0x50
 	programStartLoc = 0x200
 	registerVF      = 15
+	screenWidth     = 64
+	screenHeight    = 32
+	spriteWidth     = 8
 )
 
 var (
@@ -97,19 +100,14 @@ func (c *Chipeight) Load(filePath string) error {
 	return nil
 }
 
+// For testing without GUI
 func (c *Chipeight) Run() {
 	for {
-		c.step()
-
-		if c.shouldDraw {
-			draw()
-		}
-
-		handleInput()
+		c.Step()
 	}
 }
 
-func (c *Chipeight) step() {
+func (c *Chipeight) Step() {
 	c.currentOpcode = uint16(c.memory[c.programCounter])<<8 | uint16(c.memory[c.programCounter+1])
 
 	log.Printf("opcode: 0x%X", c.currentOpcode)
@@ -121,10 +119,10 @@ func (c *Chipeight) step() {
 	}
 }
 
-func draw() {
-
+func (c *Chipeight) ShouldDraw() bool {
+	return c.shouldDraw
 }
 
-func handleInput() {
-
+func (c *Chipeight) GetScreen() [screenWidth * screenHeight]uint8 {
+	return c.screen
 }
