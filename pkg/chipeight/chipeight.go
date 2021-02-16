@@ -61,7 +61,7 @@ type Chipeight struct {
 	registers     [16]uint8
 	indexRegister uint16
 
-	screen [64 * 32]uint8
+	screen [screenWidth * screenHeight]uint8
 	keys   [16]uint8
 
 	currentOpcode  uint16

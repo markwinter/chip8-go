@@ -20,7 +20,7 @@ func getRegisterY(opcode uint16) uint8 {
 func op0000(c *Chipeight) {
 	switch c.currentOpcode & 0x000F {
 	case 0x0:
-		c.screen = [64 * 32]uint8{}
+		c.screen = [screenWidth * screenHeight]uint8{}
 		c.programCounter += 2
 	case 0xE:
 		value, err := c.stack.Top()
