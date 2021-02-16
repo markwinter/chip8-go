@@ -38,7 +38,7 @@ func Test_CallRet(t *testing.T) {
 
 	c8.Step()
 
-	if c8.programCounter != 0x200 {
-		t.Errorf("PC should be 0x200 but got 0x%X", c8.programCounter)
+	if c8.programCounter != 0x202 {
+		t.Errorf("PC should be 0x202 but got 0x%X", c8.programCounter)
 	}
 }

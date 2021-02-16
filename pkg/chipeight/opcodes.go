@@ -28,7 +28,7 @@ func op0000(c *Chipeight) {
 			log.Panicf("Tried to return from subroutine but stack was empty")
 		}
 
-		c.programCounter = value.(uint16)
+		c.programCounter = value.(uint16) + 2 // +2 so we skip over the CALL instruction
 
 		c.stack.Pop()
 	}
