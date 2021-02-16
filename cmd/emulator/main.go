@@ -58,7 +58,7 @@ func main() {
 
 	c8 := chipeight.NewChipeight()
 
-	loadErr := c8.Load(*file)
+	loadErr := c8.LoadROM(*file)
 	if loadErr != nil {
 		log.Fatalf("failed to load file: %v", loadErr)
 	}

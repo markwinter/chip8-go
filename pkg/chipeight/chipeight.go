@@ -87,12 +87,28 @@ func NewChipeight() *Chipeight {
 	return c
 }
 
-func (c *Chipeight) Load(filePath string) error {
+func (c *Chipeight) GetRegisters() [16]uint8 {
+	return c.registers
+}
+
+func (c *Chipeight) GetIndexRegister() uint16 {
+	return c.indexRegister
+}
+
+func (c *Chipeight) LoadROM(filePath string) error {
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
 
+	for i := 0; i < len(data); i++ {
+		c.memory[programStartLoc+i] = data[i]
+	}
+
+	return nil
+}
+
+func (c *Chipeight) LoadBytes(data []byte) error {
 	for i := 0; i < len(data); i++ {
 		c.memory[programStartLoc+i] = data[i]
 	}
