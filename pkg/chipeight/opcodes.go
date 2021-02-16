@@ -21,14 +21,13 @@ func op0000(c *Chipeight) {
 	switch c.currentOpcode & 0x000F {
 	case 0x0:
 		c.screen = [screenWidth * screenHeight]uint8{}
-		c.programCounter += 2
 	case 0xE:
 		value, err := c.stack.Top()
 		if err != nil {
 			log.Panicf("Tried to return from subroutine but stack was empty")
 		}
 
-		c.programCounter = value.(uint16) + 2 // +2 so we skip over the CALL instruction
+		c.programCounter = value.(uint16)
 
 		c.stack.Pop()
 	}
@@ -53,8 +52,6 @@ func op3000(c *Chipeight) {
 	if value == c.registers[register] {
 		c.programCounter += 2
 	}
-
-	c.programCounter += 2
 }
 
 // 4XNN: Skips next instruction if VX != NN
@@ -65,8 +62,6 @@ func op4000(c *Chipeight) {
 	if value != c.registers[register] {
 		c.programCounter += 2
 	}
-
-	c.programCounter += 2
 }
 
 // 5XY0: Skips next instruction if VX equals VY
@@ -77,22 +72,18 @@ func op5000(c *Chipeight) {
 	if c.registers[registerX] == c.registers[registerY] {
 		c.programCounter += 2
 	}
-
-	c.programCounter += 2
 }
 
 // 6XNN: Sets VX to NN
 func op6000(c *Chipeight) {
 	register := getRegisterX(c.currentOpcode)
 	c.registers[register] = uint8(c.currentOpcode & 0x00FF)
-	c.programCounter += 2
 }
 
 // 7XNN: Adds NN to VX
 func op7000(c *Chipeight) {
 	register := getRegisterX(c.currentOpcode)
 	c.registers[register] += uint8(c.currentOpcode & 0x00FF)
-	c.programCounter += 2
 }
 
 // 8XY0: Set VX = VY
@@ -146,8 +137,6 @@ func op8000(c *Chipeight) {
 		c.registers[registerVF] = (c.registers[registerX] & 0x80) >> 7
 		c.registers[registerX] <<= 1
 	}
-
-	c.programCounter += 2
 }
 
 // 9XY0: Skips next instruction if VX doesn't equal VY
@@ -158,14 +147,11 @@ func op9000(c *Chipeight) {
 	if c.registers[registerX] != c.registers[registerY] {
 		c.programCounter += 2
 	}
-
-	c.programCounter += 2
 }
 
 // ANNN: Sets I to NNN
 func opA000(c *Chipeight) {
 	c.indexRegister = c.currentOpcode & 0x0FFF
-	c.programCounter += 2
 }
 
 // BNNN: Jump to the address NNN plus V0
@@ -183,8 +169,6 @@ func opC000(c *Chipeight) {
 	register := getRegisterX(c.currentOpcode)
 
 	c.registers[register] = nn & randomNumber
-
-	c.programCounter += 2
 }
 
 // DXYN: Draw at (VX, VY) with width=8, height=N+1
@@ -223,7 +207,6 @@ func opD000(c *Chipeight) {
 	}
 
 	c.shouldDraw = true
-	c.programCounter += 2
 }
 
 // EX9E: Skip next instruction if key stored in VX is pressed
@@ -242,7 +225,6 @@ func opE000(c *Chipeight) {
 			c.programCounter += 2
 		}
 	}
-	c.programCounter += 2
 }
 
 // FX07: Set VX = delay timer
@@ -299,6 +281,4 @@ func opF000(c *Chipeight) {
 			c.registers[i] = c.memory[c.indexRegister+uint16(i)]
 		}
 	}
-
-	c.programCounter += 2
 }

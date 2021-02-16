@@ -122,6 +122,10 @@ func (c *Chipeight) Step() {
 		opFunction(c)
 	} else {
 		log.Printf("unknown opcode: 0x%X", c.currentOpcode)
+	}
+
+	// Increase PC except for special opcodes: CALL, JMP
+	if c.currentOpcode != 0x1000 && c.currentOpcode != 0x2000 {
 		c.programCounter += 2
 	}
 
