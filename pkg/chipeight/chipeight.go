@@ -125,7 +125,7 @@ func (c *Chipeight) Step() {
 	}
 
 	// Increase PC except for special opcodes: CALL, JMP
-	if c.currentOpcode != 0x1000 && c.currentOpcode != 0x2000 {
+	if (c.currentOpcode&0xF000) != 0x1000 && (c.currentOpcode&0xF000) != 0x2000 {
 		c.programCounter += 2
 	}
 
