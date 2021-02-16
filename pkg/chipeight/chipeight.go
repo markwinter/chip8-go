@@ -87,14 +87,6 @@ func NewChipeight() *Chipeight {
 	return c
 }
 
-func (c *Chipeight) GetRegisters() [16]uint8 {
-	return c.registers
-}
-
-func (c *Chipeight) GetIndexRegister() uint16 {
-	return c.indexRegister
-}
-
 func (c *Chipeight) LoadROM(filePath string) error {
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
