@@ -2,10 +2,11 @@ package main
 
 import (
 	"flag"
-	"github.com/hajimehoshi/ebiten"
-	"github.com/markwinter/chip8-go/pkg/chipeight"
 	"image/color"
 	"log"
+
+	"github.com/hajimehoshi/ebiten"
+	chipeight "github.com/markwinter/chip8-go"
 )
 
 const (

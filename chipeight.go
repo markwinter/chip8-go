@@ -1,7 +1,6 @@
 package chipeight
 
 import (
-	"github.com/markwinter/chip8-go/pkg/stack"
 	"io/ioutil"
 	"log"
 )
@@ -34,25 +33,6 @@ var (
 		0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
 		0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 	}
-
-	opcodeMap = map[uint16]func(*Chipeight){
-		0x0000: op0000,
-		0x1000: op1000,
-		0x2000: op2000,
-		0x3000: op3000,
-		0x4000: op4000,
-		0x5000: op5000,
-		0x6000: op6000,
-		0x7000: op7000,
-		0x8000: op8000,
-		0x9000: op9000,
-		0xA000: opA000,
-		0xB000: opB000,
-		0xC000: opC000,
-		0xD000: opD000,
-		0xE000: opE000,
-		0xF000: opF000,
-	}
 )
 
 type Chipeight struct {
@@ -72,7 +52,7 @@ type Chipeight struct {
 
 	shouldDraw bool
 
-	stack stack.Stack
+	stack Stack
 }
 
 func NewChipeight() *Chipeight {
@@ -118,9 +98,40 @@ func (c *Chipeight) Run() {
 func (c *Chipeight) Step() {
 	c.currentOpcode = uint16(c.memory[c.programCounter])<<8 | uint16(c.memory[c.programCounter+1])
 
-	if opFunction, ok := opcodeMap[c.currentOpcode&0xF000]; ok {
-		opFunction(c)
-	} else {
+	switch c.currentOpcode & 0xF000 {
+	case 0x0000:
+		op0000(c)
+	case 0x1000:
+		op1000(c)
+	case 0x2000:
+		op2000(c)
+	case 0x3000:
+		op3000(c)
+	case 0x4000:
+		op4000(c)
+	case 0x5000:
+		op5000(c)
+	case 0x6000:
+		op6000(c)
+	case 0x7000:
+		op7000(c)
+	case 0x8000:
+		op8000(c)
+	case 0x9000:
+		op9000(c)
+	case 0xA000:
+		opA000(c)
+	case 0xB000:
+		opB000(c)
+	case 0xC000:
+		opC000(c)
+	case 0xD000:
+		opD000(c)
+	case 0xE000:
+		opE000(c)
+	case 0xF000:
+		opF000(c)
+	default:
 		log.Printf("unknown opcode: 0x%X", c.currentOpcode)
 	}
 

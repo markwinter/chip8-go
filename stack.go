@@ -1,10 +1,11 @@
-package stack
+package chipeight
 
 import (
 	"errors"
 	"sync"
 )
 
+// TODO: Update to use generics
 type Stack struct {
 	lock     sync.Mutex
 	elements []interface{}
